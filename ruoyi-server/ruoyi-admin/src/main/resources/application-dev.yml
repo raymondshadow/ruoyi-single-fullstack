@@ -1,0 +1,25 @@
+# 本地开发环境覆盖配置
+ruoyi:
+  # 本地文件上传目录，避免使用 Windows / Linux 示例路径
+  profile: ./uploadPath
+
+spring:
+  datasource:
+    druid:
+      master:
+        url: jdbc:mysql://localhost:3306/spring_boot_demo?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+        username: root
+        password: 123456
+      slave:
+        username: root
+        password: 123456
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+      password: 123456
+
+logging:
+  level:
+    com.ruoyi: debug
