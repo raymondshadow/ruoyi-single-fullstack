@@ -1,0 +1,89 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ruoyi-backend
+  namespace: quiz-ruoyi
+spec:
+  selector:
+    app: ruoyi-backend
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ruoyi-backend
+  namespace: quiz-ruoyi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ruoyi-backend
+  template:
+    metadata:
+      labels:
+        app: ruoyi-backend
+    spec:
+      containers:
+        - name: ruoyi-backend
+          image: your-registry/quiz-ruoyi-backend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: http
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: prod
+            - name: RUOYI_PROFILE
+              value: /data/ruoyi/upload
+            - name: LOG_PATH
+              value: /tmp/logs
+            - name: MYSQL_URL
+              value: jdbc:mysql://mysql:3306/ry_vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+            - name: MYSQL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: quiz-ruoyi-secret
+                  key: mysql-user
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: quiz-ruoyi-secret
+                  key: mysql-password
+            - name: REDIS_HOST
+              value: redis
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_DB
+              value: "2"
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: quiz-ruoyi-secret
+                  key: redis-password
+            - name: TOKEN_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: quiz-ruoyi-secret
+                  key: token-secret
+            - name: JAVA_OPTS
+              value: -Xms512m -Xmx1024m
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 20
+          volumeMounts:
+            - name: ruoyi-upload
+              mountPath: /data/ruoyi/upload
+      volumes:
+        - name: ruoyi-upload
+          persistentVolumeClaim:
+            claimName: ruoyi-upload-pvc

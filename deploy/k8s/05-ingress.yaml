@@ -1,0 +1,40 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ruoyi-backend-ingress
+  namespace: quiz-ruoyi
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: quiz-ruoyi.example.com
+      http:
+        paths:
+          - path: /prod-api(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: ruoyi-backend
+                port:
+                  number: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ruoyi-frontend-ingress
+  namespace: quiz-ruoyi
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: quiz-ruoyi.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ruoyi-frontend
+                port:
+                  number: 80

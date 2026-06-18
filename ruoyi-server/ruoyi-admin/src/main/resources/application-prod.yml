@@ -1,24 +1,27 @@
 # 生产环境覆盖配置
 # 部署前请改成真实数据库、Redis、上传目录
 ruoyi:
-  profile: ./uploadPath-prod
+  profile: ${RUOYI_PROFILE:/data/ruoyi/upload}
 
 spring:
   datasource:
     druid:
       master:
-        url: jdbc:mysql://127.0.0.1:3306/ry-vue-prod?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=Asia/Shanghai
-        username: root
-        password: password
+        url: ${MYSQL_URL:jdbc:mysql://mysql:3306/ry_vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai}
+        username: ${MYSQL_USERNAME:root}
+        password: ${MYSQL_PASSWORD:password}
       slave:
-        username: root
-        password: password
+        username: ${MYSQL_SLAVE_USERNAME:${MYSQL_USERNAME:root}}
+        password: ${MYSQL_SLAVE_PASSWORD:${MYSQL_PASSWORD:password}}
   data:
     redis:
-      host: 127.0.0.1
-      port: 6379
-      database: 2
-      password: 123456
+      host: ${REDIS_HOST:redis}
+      port: ${REDIS_PORT:6379}
+      database: ${REDIS_DB:2}
+      password: ${REDIS_PASSWORD:123456}
+
+token:
+  secret: ${TOKEN_SECRET:abcdefghijklmnopqrstuvwxyz}
 
 logging:
   level:
